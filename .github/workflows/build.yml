@@ -30,6 +30,10 @@ jobs:
         pip install --upgrade pip
         pip install --upgrade "Cython<3.0.0" virtualenv buildozer
 
+    - name: Clean Old Buildozer Cache
+      run: |
+        buildozer android clean
+
     - name: Build with Buildozer
       run: |
         yes | buildozer -v android debug
