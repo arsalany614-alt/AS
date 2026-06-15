@@ -8,10 +8,10 @@ version = 0.1
 requirements = python3, kivy==2.3.0, kivymd==1.2.0, requests, pillow, materialyoucolor, exceptiongroup, asyncgui, asynckivy
 orientation = portrait
 fullscreen = 0
-
-# Android specific configurations (Locked for 100% compatibility)
 android.api = 33
 android.minapi = 24
+android.ndk_path = 
+android.sdk_path = 
 android.ndk = 25b
 android.archs = arm64-v8a, armeabi-v7a
 android.allow_backup = True
