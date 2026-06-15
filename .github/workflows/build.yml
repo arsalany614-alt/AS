@@ -26,7 +26,7 @@ jobs:
     - name: Install Buildozer Dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential libffi-dev python3-dev unzip zlib1g-dev git ccache auto-conf autoconf automake libtool
+        sudo apt-get install -y build-essential libffi-dev python3-dev unzip zlib1g-dev git ccache autoconf automake libtool
         pip install --upgrade Cython==0.29.33 virtualenv buildozer
 
     - name: Build with Buildozer
