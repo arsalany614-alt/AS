@@ -23,23 +23,16 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
-
-    - name: Install Android SDK Components
-      run: |
-        sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.2"
-
     - name: Install Buildozer Dependencies
       run: |
+        sudo dpkg --add-architecture i386
         sudo apt-get update
-        sudo apt-get install -y build-essential libffi-dev python3-dev unzip zlib1g-dev git ccache autoconf automake libtool pkg-config
+        sudo apt-get install -y build-essential libffi-dev python3-dev unzip zlib1g-dev git ccache autoconf automake libtool pkg-config libncurses5:i386 libstdc++6:i386 libgtk2.0-0:i386
         pip install --upgrade pip
         pip install --upgrade Cython==0.29.33 virtualenv buildozer
 
     - name: Build with Buildozer
       run: |
-        export GRADLE_OPTS="-Dorg.gradle.jvmargs=-Xmx4g"
         yes | buildozer -v android debug
 
     - name: Upload APK Artifact
