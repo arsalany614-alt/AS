@@ -17,10 +17,23 @@ jobs:
       with:
         python-version: '3.10'
 
-    - name: Install Dependencies
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Install Android SDK Components
+      run: |
+        mkdir -p $HOME/.android
+        touch $HOME/.android/repositories.cfg
+        yes | sdkmanager --licenses
+        sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.1"
+
+    - name: Install Buildozer Dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential libffi-dev python3-dev unzip zlib1g-dev openjdk-17-jdk git ccache
+        sudo apt-get install -y build-essential libffi-dev python3-dev unzip zlib1g-dev git ccache
         pip install --upgrade Cython==0.29.33 virtualenv buildozer
 
     - name: Build with Buildozer
