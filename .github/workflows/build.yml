@@ -23,19 +23,20 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
+    - name: Clean build caches
+      run: |
+        rm -rf .buildozer/
+        rm -rf ~/.buildozer/
+
     - name: Install Buildozer Dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y build-essential libffi-dev python3-dev unzip zlib1g-dev git ccache autoconf automake libtool pkg-config cmake
         pip install --upgrade pip
         pip install --upgrade "Cython<3.0.0" virtualenv buildozer
-        rm -rf ~/.buildozer/
-        rm -rf .buildozer/
-        mkdir -p ~/.buildozer/android/platform/
 
-    - name: Run Buildozer Autofix & Build
+    - name: Run Buildozer Build
       run: |
-        buildozer android clean || true
         yes | buildozer -v android debug
 
     - name: Upload APK Artifact
