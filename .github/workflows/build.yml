@@ -1,8 +1,14 @@
-name: Build APK
+name: Build SENTRA AS Android APK
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
   workflow_dispatch:
 
 jobs:
@@ -10,37 +16,75 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-    - uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
 
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        distribution: 'temurin'
-        java-version: '17'
+      - name: Set up Java JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
 
-    - name: Clean build caches
-      run: |
-        rm -rf .buildozer/
-        rm -rf ~/.buildozer/
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            ccache \
+            git \
+            libffi-dev \
+            libssl-dev \
+            pkg-config \
+            python3-dev \
+            zip \
+            unzip \
+            zlib1g-dev \
+            libgdbm-dev \
+            libncurses5-dev \
+            libsqlite3-dev \
+            libreadline-dev \
+            bzip2 \
+            libbz2-dev \
+            liblzma-dev \
+            tk-dev \
+            libdb-dev \
+            autoconf \
+            libtool \
+            libgmp-dev \
+            libmpfr-dev \
+            libmpc-dev
 
-    - name: Install Buildozer Dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y build-essential libffi-dev python3-dev unzip zlib1g-dev git ccache autoconf automake libtool pkg-config cmake
-        pip install --upgrade pip
-        pip install --upgrade "Cython<3.0.0" virtualenv buildozer
+      - name: Cache Buildozer Downloads
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.buildozer
+            .buildozer
+          key: ${{ runner.os }}-buildozer-${{ hashFiles('buildozer.spec') }}
+          restore-keys: |
+            ${{ runner.os }}-buildozer-
 
-    - name: Run Buildozer Build
-      run: |
-        yes | buildozer -v android debug
+      - name: Install Buildozer and Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "Cython>=0.29.21,<3.0.0"
+          python -m pip install buildozer
 
-    - name: Upload APK Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: Android-APK
-        path: .buildozer/android/platform/build-arm64-v8a_armeabi-v7a/dists/asapp/bin/*.apk
+      - name: Build Android APK
+        env:
+          ACCEPT_SDK_LICENSE: "true"
+        run: |
+          # Use yes to automatically accept Android SDK licenses if requested
+          yes | buildozer -v android debug
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sentra-as-debug-apk
+          path: bin/*.apk
+          if-no-files-found: error
